@@ -1,0 +1,433 @@
+# Code Guidelines for LLMs
+
+FOLLOW THESE RULES STRICTLY - These guidelines ensure robust, maintainable scripts that handle edge cases gracefully and pass all linter checks.
+
+## Core Principles
+
+- **Simplicity**: Do more with less. Elegance lies in simplicity. Keep it simple.
+- **Correctness**: Tested is robust. Correctness over speed. Do the job correctly with least changes.
+- **Readability**: Code is self-documenting. Clear names, small functions, explicit intent.
+- **Consistency**: Regularity favors consistency. Follow established patterns.
+- **Safety**: Explicit over implicit. Safe by default with strict error checking.
+- **Maintainability**: No hardcoded values. Remove unused code. Comments explain "why", not "what".
+- **Quality**: ALWAYS lint and format. Pass all shellcheck validations.
+
+## BASH-SPECIFIC REQUIREMENTS
+
+### Strict Mode Settings
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+# Never use: set -e (can mask important errors)
+```
+
+### Error Handling Philosophy
+
+- NEVER redirect to `/dev/null` - This hides critical debugging information
+- NEVER suppress error output - Always capture and handle errors explicitly
+- Use proper exit code checking instead of hiding failures
+
+```bash
+# ❌ BAD - Hides errors
+command 2>/dev/null
+value=$(yq -r "$key" "$CONFIG_FILE" 2>/dev/null)
+if ! command -v "$dep" >/dev/null 2>&1; then
+
+# ✅ GOOD - Captures errors for debugging
+value=$(yq -r "$key" "$CONFIG_FILE")
+if [[ $value ]]; then
+    # process value
+fi
+
+
+```
+
+## Variable Management
+
+### Declaration and Scope Rules
+
+- Always declare variables before assignment to prevent undefined variable errors
+- Use `declare` at global scope and `local` inside functions
+- Global variables must contain "GLOBAL" in their name for clarity
+- Initialize all variables explicitly - no implicit empty values
+- Declare and assign on separate lines for better error tracking
+- ALL variables must be declared at the top - global variables at the top of the script, local variables at the top of functions
+- LONG COMMANDS SHOULD BE MULTILINE
+- Variables should hint their type, primarily for arrays or references
+- Initialize variables in dependency order to avoid unbound variable errors
+
+```bash
+# ✅ GOOD - Global variables at top of script
+declare INPUT_GLOBAL=""
+declare OUTPUT_GLOBAL=""
+declare -r CONFIG_FILE_GLOBAL="/path/to/config"
+declare -r MAX_RETRIES_GLOBAL=3
+
+# ✅ GOOD - Function with all local variables at top
+function process_data() {
+    # ALL local variables declared at the top of function
+    local exit_code=""
+    local jq_output=""
+    local jq_status_exit=1
+    local result=""
+    local retry_count=0
+    local tesseract_output
+    local -a array_pdf=()
+
+
+
+    if [[ "$(echo "$full_response" | head -1 | jq -e '.choices[0].delta' 2>&1)" -eq 0 ]]; then
+        echo "Valid JSON response"
+    fi
+
+  tesseract_output=$(tesseract \
+    "$png_file" \
+    stdout -l "$TESSERACT_LANG_GLOBAL" \
+    --dpi "$DPI_GLOBAL" \
+    --oem 3 \
+    --psm 1)
+}
+
+# ❌ AVOID - Variables scattered throughout
+function bad_example() {
+    local use_first_var=$(command $first_var) # call unbound variable.
+    local first_var=""  # Variable declaration
+
+    some_command
+
+    local second_var=""  # BAD: Variable declared in middle of function
+
+    more_logic
+
+    local third_var=""   # BAD: Another variable declared later
+}
+
+# ❌ AVOID
+SOME_VAR=$(...) # Unclear scope and purpose
+jq_check_output=$(echo "$full_response" | head -1 | jq -e '.choices[0].delta' 2>&1)
+jq_check_exit="$?"
+if [[ $jq_check_exit -eq 0 ]]; then  # Redundant check without output validation
+    echo "Valid JSON"
+fi
+```
+
+### Variable Naming and Usage
+
+- All variables must be declared at the top of their scope (script or function)
+
+- Quote all variables, especially `"$?"` when assigning exit codes
+- Use meaningful, descriptive names
+
+```bash
+# ✅ GOOD - All variables at top, ensuring NO unbound variables
+local attempt_number=0
+local iteration_count=""
+local pdf_basename=""
+local result=""
+local temp_file=""
+
+# Function logic follows variable declarations
+# ... rest of function implementation
+
+# ❌ AVOID - Variables declared throughout function
+function bad_function() {
+    local i=0  # Variable here
+
+    some_logic
+
+    local x=""  # BAD: Variable in middle
+
+    more_logic
+
+    local tmp=""  # BAD: Variable at end
+}
+```
+
+## Control Flow and Conditionals
+
+### Explicit Control Structures
+
+- Use explicit `if/then/fi` blocks for all conditionals - never one-liners
+- Ensure all control blocks are properly closed (`if/fi`, `while/done`, `for/done`)
+- Capture command output explicitly before testing conditions
+- Always assign exit codes to variables instead of using `$?` directly
+- Avoid using `$?` when possible - prefer direct command testing
+
+```bash
+# ✅ GOOD - Explicit output capture and testing
+local output=""
+local exit_code=""
+output=$(some_command)
+exit_code="$?"
+
+if [[ "$exit_code" -eq 0 ]]; then
+    echo "Success: $output"
+fi
+
+# ✅ Direct command testing when output not needed
+if some_command; then
+    echo "Command succeeded"
+fi
+
+# ❌ AVOID
+if some_command; then process; fi  # One-liner
+if (( i++ )); then                 # Compound arithmetic in condition
+if [[ $? -eq 0 ]]; then           # Direct $? usage
+
+# ❌ BAD - Direct $? usage
+convert_to_mp3 "$final_wav" "$final_mp3"
+if [[ $? -eq 0 ]]; then   # Should capture exit code first
+    log_success "Completed project: $pdf_name"
+    return 0
+else
+    log_error "Failed to convert to MP3 for $pdf_name"
+    return 1
+fi
+
+# ✅ GOOD - Capture exit code explicitly
+local convert_result=""
+local convert_exit=""
+convert_result=$(convert_to_mp3 "$final_wav" "$final_mp3" 2>&1)
+convert_exit="$?"
+if [[ "$convert_exit" -eq 0 ]]; then
+    log_success "Completed project: $pdf_name"
+    return 0
+else
+    log_error "Failed to convert to MP3 for $pdf_name: $convert_result"
+    return 1
+fi
+```
+
+### Arithmetic and Comparisons
+
+- Use `i=$((i + 1))` instead of `((i++))`
+- Prefer `[[ ]]` over `[ ]` for test conditions
+- Prefer `[[ $var -eq 0 ]]` over `((var == 0))` for arithmetic operations
+
+```bash
+# ✅ GOOD
+for iteration_count in $(seq 1 "$MAX_RETRIES_GLOBAL"); do
+    attempt_number=$((attempt_number + 1))
+    if [[ "$attempt_number" -eq "$MAX_RETRIES_GLOBAL" ]]; then
+        break
+    fi
+done
+
+# ❌ AVOID
+for ((i++; i < max; i++)); do  # Non-portable and unclear
+if ((var == 0)); then          # Less reliable than [[ ]]
+```
+
+## File Operations and I/O
+
+### Safe File Operations
+
+- Use atomic file operations (`mv`, `flock`) to prevent race conditions in parallel processing
+- Prefer `rsync` over `cp` for file copying operations
+- Use `cmd < file` instead of `cat file | cmd` (avoid useless cat)
+- Implement solid but efficient retry logic for critical operations
+
+```bash
+# ✅ GOOD - Atomic and efficient
+rsync -av "$source" "$destination"
+
+# Process files efficiently
+while read -r line; do
+    process_line "$line"
+done < "$input_file"
+
+# Create atomic file updates
+temp_file=$(mktemp)
+process_data > "$temp_file"
+mv "$temp_file" "$final_file"
+
+# ❌ AVOID
+cp "$source" "$destination"  # Less robust than rsync
+cat "$input_file" | while read line; do  # Useless cat
+```
+
+### printf Best Practices
+
+- Never use variables directly in printf format strings
+- Always use `printf '%s' "$VARIABLE"` for string output
+
+```bash
+# ✅ GOOD
+printf '%s\n' "$message"
+printf '%d files processed\n' "$count"
+
+# ❌ AVOID
+printf "$message"  # Dangerous - treats variable as format string
+```
+
+## Configuration Management
+
+### Configuration Variables
+
+- Configuration file variables should be readonly (`declare -r`)
+- API keys and sensitive data must be readonly
+- No hardcoded values - use configuration variables
+- Everything should be parameterized and moved to project.toml
+
+```bash
+# ✅ GOOD - Readonly configuration
+declare -r API_KEY_GLOBAL="$1"
+declare -r CONFIG_FILE_GLOBAL="/etc/myapp/config"
+declare -r MAX_RETRIES_GLOBAL=3
+declare -r DPI_GLOBAL=600
+
+# ❌ AVOID
+api_key="hardcoded-key-123"  # Not readonly, hardcoded
+timeout=30                   # Hardcoded magic number
+dpi=600                      # Should be configurable
+```
+
+## Directory Structure Standards
+
+### Standard Directory Layout
+
+- `INPUT_GLOBAL`: Location where raw PDF files exist
+- `OUTPUT_GLOBAL`: Location where all produced artifacts are stored
+- All artifacts saved under: `$OUTPUT_GLOBAL/$PDF_NAME/<artifact_type>/`
+- Maintain consistent directory structure across all operations
+
+```bash
+# ✅ GOOD - Consistent structure
+for pdf_file in "$INPUT_GLOBAL"/*.pdf; do
+    pdf_basename=$(basename "$pdf_file" .pdf)
+    output_dir="$OUTPUT_GLOBAL/$pdf_basename"
+
+    # Create structured output directories
+    local mkdir_result=""
+    local mkdir_exit=""
+    mkdir_result=$(mkdir -p "$output_dir/extracted" "$output_dir/processed" 2>&1)
+    mkdir_exit="$?"
+
+    if [[ "$mkdir_exit" -ne 0 ]]; then
+        echo "Failed to create output directories: $mkdir_result"
+        continue
+    fi
+done
+```
+
+## Error Handling and Debugging
+
+### Debugging Best Practices
+
+- Enable strict error checking with `set -u` to catch unbound variables
+- Clean up unused variables and maintain detailed comments
+- Avoid unreachable code or redundant commands
+- Use `grep -q` for silent boolean checks
+
+```bash
+# ✅ GOOD - Comprehensive error handling
+function critical_operation() {
+    local result=""
+    local exit_code=""
+
+    result=$(critical_command 2>&1)
+    exit_code="$?"
+
+    if [[ "$exit_code" -ne 0 ]]; then
+        echo "Operation failed with exit code $exit_code: $result" >&2
+        return "$exit_code"
+    fi
+
+    echo "$result"
+}
+
+# ✅ GOOD - Silent boolean check
+if grep -q "pattern" "$file"; then
+    echo "Pattern found"
+fi
+```
+
+## Code Quality and Maintenance
+
+```bash
+# ✅ GOOD - Self-documenting with clear intent and proper variable organization
+# Process each PDF file in the input directory and generate artifacts
+# This function handles the complete pipeline from PDF to processed output
+function process_pdf_pipeline() {
+    # ALL local variables declared at the top - required pattern
+    local pdf_file="$1"
+    local pdf_basename=""
+    local output_dir=""
+    local mkdir_result=""
+    local mkdir_exit=""
+
+    # Function logic starts after all variable declarations
+    pdf_basename=$(basename "$pdf_file" .pdf)
+    output_dir="$OUTPUT_GLOBAL/$pdf_basename"
+
+    # Create output structure for this PDF's artifacts
+    # Each PDF gets its own subdirectory with organized artifact types
+    mkdir_result=$(mkdir -p "$output_dir/extracted" "$output_dir/processed" 2>&1)
+    mkdir_exit="$?"
+
+    if [[ "$mkdir_exit" -ne 0 ]]; then
+        echo "Failed to create output directories for $pdf_basename: $mkdir_result" 2>&1
+        return 1
+    fi
+
+    echo "Successfully prepared directories for $pdf_basename"
+}
+```
+
+## API and External Commands
+
+### External Command Handling
+
+- Avoid mixing different API calls in the same function
+- Capture both output and exit codes for external commands
+- Implement proper error handling for all external dependencies
+- Always consult the latest documentation for APIs
+
+```bash
+# ✅ GOOD - Proper external command handling with variables at top
+function call_api() {
+    # ALL local variables at the top of function
+    local api_response=""
+    local api_exit_code=""
+    local retry_count=0
+
+    # Function logic after variable declarations
+    while [[ "$retry_count" -lt "$MAX_RETRIES_GLOBAL" ]]; do
+        api_response=$(curl -s -w "%{http_code}" "$API_ENDPOINT" 2>&1)
+        api_exit_code="$?"
+
+        if [[ "$api_exit_code" -eq 0 ]]; then
+            echo "$api_response"
+            return 0
+        fi
+
+        retry_count=$((retry_count + 1))
+        sleep "$RETRY_DELAY_GLOBAL"
+    done
+
+    echo "API call failed after $MAX_RETRIES_GLOBAL attempts" >&2
+    return 1
+}
+```
+
+## Compliance Checklist
+
+**Before submitting any bash script, verify:**
+
+- [ ] Variables declared at top of scope (global/function)
+- [ ] Global variables suffixed with "\_GLOBAL"
+- [ ] No `/dev/null` redirections
+- [ ] Exit codes captured in variables before testing
+- [ ] All control blocks closed (if/fi, while/done, for/done)
+- [ ] Configuration values are readonly (`declare -r`)
+- [ ] File operations are atomic (use `mv`, `flock`, `rsync`)
+- [ ] Error messages are descriptive and logged to stderr
+- [ ] Passes shellcheck validation
+- [ ] No unused variables or unreachable code
+- [ ] All variables properly quoted
+- [ ] Uses `printf '%s'` instead of `printf "$var"`
+- [ ] Functions do one thing well (Single Responsibility)
+- [ ] Clear, intention-revealing names
+
