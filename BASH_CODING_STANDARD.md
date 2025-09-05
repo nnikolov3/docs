@@ -1,4 +1,195 @@
-# Strict Python Coding Standard
+# Foundational Design Principles
+
+This guide defines the non-negotiable, foundational design principles that govern all software development. Adherence to these principles is mandatory across all projects, as they are the bedrock of systems that are clear, robust, maintainable, and professional. They represent our collective commitment to quality and serve as the single source of truth that informs and unifies all language-specific coding standards. Ignoring them leads to technical debt, brittle systems, and slowed innovation.
+
+### Core Principles
+
+- **Simplicity is Non-Negotiable**: Strive for the most straightforward solution that fulfills all requirements. Complexity is not a measure of sophistication; it is the primary source of bugs, security vulnerabilities, and crippling maintenance overhead. A complex system is difficult to reason about, making it impossible to modify with confidence. If a design is not simple, it is wrong---re-evaluate the approach.
+
+- **Methodical Problem Decomposition**: Rushing into a solution without a deep understanding of the problem is a primary cause of flawed software. Before writing any implementation code, you must:
+  1.  **Identify and Isolate the Core Problem:** Articulate the precise problem to be solved, separating it from surrounding concerns.
+
+  2.  **Deconstruct into Subproblems:** Break the core problem down into the smallest possible, independent, verifiable subproblems.
+
+  3.  **Analyze Constraints and Environment:** For each subproblem, consider the limitations and features of the chosen language, framework, and environment. Identify potential edge cases, failure modes, and performance constraints up front.
+
+  4.  **Solve Incrementally:** Address one single subproblem at a time. Follow a deliberate, robust process (such as TDD) to solve and verify each piece before integrating it into the larger solution. This methodical, step-by-step approach prevents complex, monolithic solutions and ensures each component is correct and well-understood.
+
+- **Explicit Over Implicit**: All intentions, dependencies, and behaviors must be clear and explicit. Code should never rely on "magic" or hidden mechanisms that obscure the cause-and-effect relationship between components. Ambiguity and side effects create a system that is unpredictable and fragile. Make all assumptions visible and auditable in the code itself.
+
+- **Self-Documenting Code and Ultimate Readability**: Code is read far more often than it is written; therefore, we optimize for the reader. The primary form of documentation is the code itself, supported by high-quality, synchronized comments.
+  - **Intention-Revealing Names:** Achieve clarity through meticulously chosen, intention-revealing names for variables, functions, and classes. **Variable names must be descriptive and unambiguous; single-letter or cryptic two-letter variables are strictly forbidden.**
+
+  - **Purpose of Comments:** Comments must explain the _why_, not the _what_. They should clarify complex logic, business rules, or the reasoning behind a specific implementation choice. If the code is so complex that it needs comments to explain _what_ it does, the code must be refactored for simplicity.
+
+  - **Comment Quality and Hygiene:** Every source file should begin with a comment explaining its purpose and responsibility within the system. Throughout the code, comments must be clear, concise, and professional. They are a critical tool for understanding, and must be maintained with the same rigor as the code itself.
+
+- **Single Responsibility and Low Complexity**: Every function, class, or module must have one, and only one, reason to change. It should do one thing and do it with precision and efficiency. This principle of clear responsibility separation naturally leads to code that is easier to test, reuse, and refactor. Keeping cognitive and cyclomatic complexity minimal is essential for creating components that are easy to understand and maintain.
+
+- **Acyclic Dependencies**: The dependency graph for modules, packages, or services must be a Directed Acyclic Graph (DAG). **Circular dependencies are strictly forbidden.** They represent a critical architectural flaw that creates a "big ball of mud," making components impossible to isolate, test, or deploy independently.
+
+- **Composition Over Inheritance**: To achieve code reuse and extend behavior, always favor composition and interfaces over implementation inheritance. Deep inheritance hierarchies lead to the "fragile base class" problem, where a change in a parent class can have unforeseen and breaking consequences for its descendants.
+
+- **Error Handling Excellence**: Handle every error explicitly and immediately where it occurs. Never ignore or swallow exceptions. **All error messages must be explicit, provide clear context about what failed, and avoid ambiguity.** The system must fail fast and loudly, preventing it from continuing in a corrupt state.
+
+- **Test-Driven Correctness**: Tests are a core part of the implementation itself. All components must be developed using a **test-driven development (TDD)** approach, writing a failing test _before_ the implementation code. The test suite is the ultimate proof of correctness. **Total test coverage must exceed 80% for any given project.**
+
+- **Verifiable Truth and No Deception**: All claims about functionality must be backed by demonstrable, verifiable proof, primarily through a comprehensive suite of passing tests. Deceptive placeholders or hardcoded return values are strictly forbidden.
+
+- **Automated Quality Enforcement**: The **extensive use of linters, formatters, and static analysis tools is mandatory and non-negotiable.** **Suppressing linter warnings with comments is strictly forbidden.** A linter warning indicates an underlying issue that must be fixed by redesigning the code, not by silencing the tool.
+
+- **Immutability By Default**: Design components to be immutable whenever possible. This practice eliminates entire classes of bugs related to side effects and unpredictable state changes.
+
+- **Efficient Memory Management**: Be deliberate about memory allocation and resource lifetimes. Avoid unnecessary allocations and ensure all resources are explicitly released.
+
+- **Consistency Reduces Cognitive Load**: Follow established style guides and project conventions with rigor to create a predictable and easily understood codebase.
+
+- **No Premature Optimization**: Write correct, clean, and simple code first. Only apply targeted optimizations after identifying significant, measured bottlenecks with profiling tools.
+
+- **Remove What Isn't Used**: Immediately delete any dead code, unused variables, stale files, or unnecessary abstractions. **This includes stale comments; if a comment no longer accurately describes the code, it must be updated or deleted immediately.** Every line of code and every comment is a liability that must be maintained.
+
+### Operational Mandates
+
+#### 1\. Pre-Code Validation
+
+- **Confirm Necessity**: Before writing any code, confirm it is absolutely necessary and does not duplicate existing functionality.
+
+- **Justify New Code**: If new code is required, document why existing solutions are insufficient.
+
+#### 2\. Implementation Discipline
+
+- **Declare at the Top**: Instantiate all variables at the top of their respective scope.
+
+- **No Magic Numbers**: Use named constants instead of hardcoded values.
+
+- **Parameterize Everything**: Strictly decouple application logic from configuration.
+
+#### 3\. Verification Loop
+
+- The development cycle is a tight, continuous loop: **Test, Implement, Lint, Format, Refactor, Repeat.**
+
+- All code must pass all automated quality checks on every change.
+
+#### 4\. Security as a Default
+
+- **Least Privilege**: Components should only have the permissions they absolutely need.
+
+- **Validate at Boundaries**: Rigorously validate and sanitize all external data.
+
+- # **Never Log Secrets**: Secrets must never be written to logs or stored in plaintext.Strict Go Coding Standard
+
+This document establishes the non-negotiable Go coding standards for all projects. It is aligned with modern Go (1.23+) and is a direct implementation of the core tenets found in the `DESIGN_PRINCIPLES_GUIDE.md`. All code must strictly adhere to these rules to ensure it is simple, robust, verifiable, and maintainable.
+
+### 1\. Core Principles: The Go Implementation
+
+All code is a direct reflection of the **`DESIGN_PRINCIPLES_GUIDE.md`**. This includes:
+
+- **Test-Driven Correctness (TDD)**: Mandatory workflow. **Test coverage must exceed 80%.**
+
+- **Automated Quality Enforcement**: Must pass `golangci-lint` with zero errors. **Suppressing linter warnings with comments (e.g., `//nolint`) is strictly forbidden.** A linter warning signals a design flaw that must be fixed, not silenced.
+
+- **Self-Documenting Code**: Use intention-revealing names. **Single-letter or cryptic variables are forbidden.**
+
+- **Simplicity and Clarity**: Write simple, readable code.
+
+- **Acyclic Dependencies**: No circular dependencies.
+
+- **Single Responsibility**: Functions and interfaces must be small and focused.
+
+- **Composition Over Inheritance**: Use struct embedding and interfaces.
+
+- **Error Handling Excellence**: Handle every `error` explicitly and immediately.
+
+- **Immutability By Default**: Avoid mutating state where possible.
+
+- **Efficient Memory Management**: Be deliberate about allocations.
+
+### 2\. Automated Quality Enforcement: The Toolchain
+
+We do not manually enforce style or catch common errors. We automate it with a comprehensive toolchain that provides a non-negotiable quality gate.
+
+- **Formatter (`gofmt`, `gofumpt`)**: Standard Go formatting is not optional.
+
+- **Comprehensive Linter (`golangci-lint`)**: This tool is mandatory and configured to enforce all standards in this document.
+
+Code that does not pass `gofmt` and `golangci-lint` is, by definition, incomplete and will be rejected.
+
+### 3\. Self-Documenting Code: Naming and Documentation
+
+Names must be explicit and intention-revealing. Use `camelCase` for unexported and `PascalCase` for exported identifiers. Every exported identifier must have a `godoc` comment.
+
+### 4\. Complexity and Maintainability Metrics
+
+To enforce **Simplicity**, all code is measured against the following metrics enforced by `golangci-lint`.
+
+- **Function Length**: Max **60 lines** or **40 statements**.
+
+- **Cyclomatic Complexity**: Max **10** per function.
+
+- **Cognitive Complexity**: Max **5** per function.
+
+Code exceeding these thresholds must be refactored.
+
+### 5\. Package and Module Design
+
+- **Package Naming**: Use lowercase, descriptive names. Avoid generic names like `util` or `common`.
+
+- **Interfaces**: Define small, focused interfaces in the package that _consumes_ the functionality ("accept interfaces, return structs").
+
+### 6\. Function and Method Design
+
+- **Single Responsibility**: A function should do one thing. If its description requires the word "and," it must be refactored.
+
+- **Return Pointers for Large Structs**: To adhere to **Efficient Memory Management**, functions returning structs larger than a small, fixed size should return a pointer (`*MyStruct`) instead of the struct by value (`MyStruct`) to avoid unnecessary copying on the stack.
+
+### 7\. Error Handling Patterns
+
+- **No Error Variable Reassignment**: To prevent subtle bugs from shadowed variables, **every call that returns an error must use a new, uniquely named error variable.** Reassigning a general `err` variable is strictly forbidden.
+
+  ```
+  // ❌ BAD: 'err' is reassigned, which can hide the first error.
+  file, err := os.Open("config.yaml")
+  if err != nil {
+      // ...
+  }
+  data, err := io.ReadAll(file) // This re-declaration is a common bug.
+  if err != nil {
+      // ...
+  }
+
+  // ✅ GOOD: Each error has a unique variable, preventing bugs.
+  file, openErr := os.Open("config.yaml")
+  if openErr != nil {
+      return fmt.Errorf("failed to open config file: %w", openErr)
+  }
+  defer file.Close()
+
+  data, readErr := io.ReadAll(file)
+  if readErr != nil {
+      return fmt.Errorf("failed to read config file: %w", readErr)
+  }
+
+  ```
+
+- **Error Wrapping**: Always wrap errors with `fmt.Errorf("...: %w", err)` to add context.
+
+- **Immediate Handling**: Check for errors immediately after a function call.
+
+### 8\. Concurrency
+
+- **Context is Mandatory**: Pass a `context.Context` as the first argument to any function that performs I/O, makes a network call, blocks, or could be long-running.
+
+- **Channels for Communication**: Use channels to communicate between goroutines. Do not communicate by sharing memory.
+
+- **Graceful Shutdown**: Ensure all long-running goroutines can be shut down gracefully.
+
+### 9\. Testing Standards
+
+- **Framework**: Use the standard `testing` package with `testify/assert` or `testify/require`.
+
+- **TDD is Mandatory**: Follow a test-driven workflow.
+
+- # **Table-Driven Tests**: Use table-driven tests for testing multiple scenarios concisely.Strict Python Coding Standard
 
 This document establishes the non-negotiable Python coding standards for all projects. It is aligned with modern Python (3.11+) and is a direct implementation of the core tenets found in the `DESIGN_PRINCIPLES_GUIDE.md`. All code must strictly adhere to these rules to ensure it is simple, robust, verifiable, and maintainable.
 
@@ -6,21 +197,25 @@ This document establishes the non-negotiable Python coding standards for all pro
 
 All code is a direct reflection of the **`DESIGN_PRINCIPLES_GUIDE.md`**. This includes:
 
-- **Test-Driven Correctness**: All logic must be developed using a test-driven development (TDD) workflow. A failing test must be written before the implementation. The test suite is the ultimate proof of correctness.
+- **Test-Driven Correctness**: Mandatory TDD workflow. **Test coverage must exceed 80%.**
 
-- **Automated Quality Enforcement**: Code must be formatted with `black`, and it must pass all `ruff` and `mypy` checks without any suppression flags before it can be considered complete.
+- **Automated Quality Enforcement**: Must pass `black`, `ruff`, and `mypy`. **Suppressing linter warnings with comments (e.g., `# noqa`) is strictly forbidden.** A linter warning indicates a problem that must be solved by redesigning the code, not by silencing the tool.
 
-- **Self-Documenting Code**: Prioritize clarity through intention-revealing names and mandatory type hints. Code must explain itself.
+- **Self-Documenting Code**: Use intention-revealing names. **Single-letter or cryptic variables are forbidden.**
 
-- **Simplicity and Clarity**: Write simple, readable code. Avoid complex one-liners or "clever" constructs.
+- **Simplicity and Clarity**: Write simple, readable code.
 
-- **Acyclic Dependencies**: Ensure a Directed Acyclic Graph (DAG) for all imports. Circular imports are a critical design flaw and are forbidden.
+- **Acyclic Dependencies**: No circular imports.
 
 - **Single Responsibility**: Classes and functions must do one thing well.
 
-- **Composition Over Inheritance**: Use composition and interfaces (`typing.Protocol`) for code reuse and flexibility.
+- **Composition Over Inheritance**: Use composition and `typing.Protocol`.
 
-- **Error Handling Excellence**: Handle all exceptions explicitly. Never use a bare `except:`.
+- **Error Handling Excellence**: Handle all exceptions explicitly with clear context.
+
+- **Immutability By Default**: Prefer immutable data structures.
+
+- **Efficient Memory Management**: Be deliberate about resource usage.
 
 ### 2\. Automated Quality Enforcement: The Toolchain
 
@@ -34,631 +229,62 @@ We do not manually enforce style. We automate it. The following toolchain is man
 
 Code that does not pass these automated checks is, by definition, incomplete.
 
-### 3\. Self-Documenting Code: Naming, Typing, and Docstrings
+### 3\. Self-Documenting Code: Naming and Typing
 
-Code is read more than it is written. Optimize for the reader.
+- **Naming Conventions**: Names must be explicit and intention-revealing.
 
-#### Naming Conventions
+- **Type Hints are Mandatory**: Every function and method signature **must** include type hints for all arguments and the return value.
 
-Names must be explicit and intention-revealing.
+### 4\. Immutability and Memory Management
 
-```
-# ❌ BAD: Ambiguous, single-letter, or abbreviated names
-def proc_data(d: list) -> list:
-    # ... what is 'd'? What does 'proc' mean?
-    pass
+- **Prefer Immutable Structures**: For collections of data that should not change, prefer tuples over lists. This prevents accidental modification and aligns with the **Immutability By Default** principle.
 
-# ✅ GOOD: Clear, descriptive, and explicit names
-def parse_user_profiles_from_json(raw_json_data: list[dict]) -> list[UserProfile]:
-    # The name clearly states its purpose, input, and output.
-    pass
+- **Use Generators for Large Datasets**: To ensure **Efficient Memory Management**, process large files or data streams using generators. This avoids loading the entire dataset into memory at once.
 
-```
+  ```
+  # ❌ BAD: Loads the entire file into memory.
+  def process_large_file(file_path: str):
+      with open(file_path) as f:
+          lines = f.readlines()
+      for line in lines:
+          # ... process line ...
 
-#### Type Hints are Mandatory
+  # ✅ GOOD: Processes the file line-by-line, using minimal memory.
+  from typing import Generator
+  def process_large_file_generator(file_path: str) -> Generator[str, None, None]:
+      with open(file_path) as f:
+          for line in f:
+              yield line
 
-Every function and method signature **must** include type hints for all arguments and the return value. This is a requirement for **Self-Documenting Code** and enables static analysis.
+  # Usage
+  # for processed_line in process_large_file_generator("huge_log.txt"):
+  #     ... do something with the line
 
-```
-# ❌ BAD: No type hints, the reader must guess the data types.
-def combine_records(users, permissions):
-    # What are users? A list of strings? A dict?
-    return {**users, **permissions}
+  ```
 
-# ✅ GOOD: Types are explicit, enabling clarity and static analysis.
-from typing import Dict
+### 5\. Module and Package Organization
 
-def combine_user_permissions(
-    users: Dict[str, User],
-    permissions: Dict[str, PermissionLevel]
-) -> Dict[str, CombinedProfile]:
-    # ... implementation ...
+- **Package Naming**: Use lowercase, descriptive names. Avoid `utils`, `common`, or `helpers`.
 
-```
-
-### 4\. Module and Package Organization
-
-Structure code to be logical and maintainable.
-
-- **Package Naming**: Use lowercase, short, and descriptive package names.
-  - **Forbidden Names**: Avoid generic names like `utils`, `common`, or `helpers`. These names become a dumping ground for unrelated code and violate the Single Responsibility Principle. Names must describe the domain functionality (e.g., `audio_playback`, `text_processing`).
-
-- **Dependency Management**: Module and package dependencies must form a Directed Acyclic Graph (DAG). **Circular imports are strictly forbidden** and must be resolved by refactoring. `ruff` will help detect these.
-
-- **Import Organization**: `ruff --fix` (with `isort` rules enabled) will handle this automatically. The standard order is:
-  1.  Standard library (`import os`)
-
-  2.  Third-party libraries (`import requests`)
-
-  3.  Local application/library-specific imports (`from . import models`)
-
-### 5\. Function and Method Design
-
-Functions are the primary unit of logic and must be kept small and focused.
-
-- **Single Responsibility**: A function should do one thing and do it well. If a function description requires the word "and," it is likely doing too much.
-
-```
-# ❌ BAD: This function has multiple responsibilities.
-def process_and_upload_report(data: list[dict], user_id: str):
-    # 1. It generates a report.
-    report_path = f"/tmp/report_{user_id}.csv"
-    with open(report_path, "w") as f:
-        # ... write csv data ...
-
-    # 2. It uploads the report.
-    s3_client.upload_file(report_path, "reports-bucket", f"{user_id}/report.csv")
-    return True
-
-# ✅ GOOD: Responsibilities are separated into focused functions.
-def generate_user_report(data: list[dict], output_path: Path) -> None:
-    """Generates a CSV report from data and saves it to a file."""
-    # ... implementation ...
-
-def upload_file_to_s3(local_path: Path, bucket: str, remote_key: str) -> None:
-    """Uploads a single file to an S3 bucket."""
-    # ... implementation ...
-
-```
-
-### 6\. Class and Interface Design
-
-Use classes to encapsulate state and behavior, and interfaces to define contracts.
-
-- **Class Design**: Keep classes small and focused. A class should have only one reason to change. Favor composition over deep inheritance hierarchies.
-
-- **Interfaces (`typing.Protocol`)**: Use protocols to define clear contracts for behavior, enabling dependency inversion and making code easier to test.
-
-```
-# ✅ GOOD: Using a Protocol to define a dependency contract.
-from typing import Protocol
-
-class Notifier(Protocol):
-    """A protocol for any object that can send a notification."""
-    def send(self, message: str) -> None:
-        ...
-
-# The function depends on the contract, not a concrete implementation.
-def process_critical_event(event: Event, notifier: Notifier) -> None:
-    """Processes an event and sends a notification."""
-    # ... logic ...
-    notifier.send(f"Event {event.id} processed successfully.")
-
-# Concrete implementations can be easily swapped (e.g., for testing).
-class EmailNotifier:
-    def send(self, message: str) -> None:
-        # ... send email ...
-
-class SlackNotifier:
-    def send(self, message: str) -> None:
-        # ... send slack message ...
-
-```
-
-- **Memory Efficiency (`__slots__`)**: For classes that will be instantiated many times and have a fixed set of attributes, use `__slots__` to reduce memory footprint by preventing the creation of an instance `__dict__`.
-
-```
-# ✅ GOOD: For data-heavy applications.
-class DataPoint:
-    __slots__ = ('timestamp', 'value', 'source')
-
-    def __init__(self, timestamp: float, value: float, source: str):
-        self.timestamp = timestamp
-        self.value = value
-        self.source = source
-
-```
-
-### 7\. Error Handling Patterns
-
-Robust error handling is non-negotiable.
-
-- **Custom Exceptions**: Define a custom exception hierarchy for your application's domain. This allows calling code to handle specific error conditions gracefully.
-
-```
-# ✅ GOOD: A clear exception hierarchy.
-class ReportError(Exception):
-    """Base exception for reporting errors."""
-    pass
-
-class ReportGenerationError(ReportError):
-    """Raised when the report content cannot be generated."""
-    pass
-
-class ReportUploadError(ReportError):
-    """Raised when uploading the report fails."""
-    pass
-
-```
-
-- **Exception Chaining**: Always use exception chaining (`raise NewException from original_exception`) to preserve the root cause of an error. This is essential for effective debugging.
-
-```
-def upload_report(report: Report) -> None:
-    try:
-        s3_client.upload(...)
-    except S3ClientError as e:
-        # Preserve the original S3 error for debugging.
-        raise ReportUploadError("Failed to upload report to S3.") from e
-
-```
-
-- **Boundary Validation**: Validate all inputs at function and method boundaries. Fail fast with a clear error message if the inputs are invalid.
-
-```
-def create_user(username: str) -> None:
-    if not username or not username.isalnum():
-        raise ValueError("Username must be non-empty and alphanumeric.")
-    # ... proceed with user creation ...
-
-```
-
-### 8\. Testing Standards
-
-Tests are the ultimate proof of correctness.
-
-- **Framework**: Use `pytest` for all testing.
-
-- **TDD is Mandatory**: Follow a test-driven workflow. Write a failing test that defines the desired behavior before writing the implementation.
-
-- **Test Isolation**: Tests must be independent and runnable in any order. Use `pytest` fixtures for setup and teardown to ensure a clean state for each test.
-
-- **Assert Exceptions**: When testing for expected errors, use `pytest.raises`.
-
-````
-# ✅ GOOD: A clear, focused test using pytest.
-import pytest
-
-def test_create_user_with_invalid_username_raises_value_error():
-    """Verify that an invalid username raises a ValueError."""
-    with pytest.raises(ValueError, match="Username must be non-empty"):
-        create_user("")
-
-    with pytest.raises(ValueError, match="alphanumeric"):
-        create_user("invalid-user!")
-
-```Strict Go Coding Standard
-=========================
-
-This document establishes the non-negotiable Go coding standards for all projects. It is aligned with modern Go (1.23+) and is a direct implementation of the core tenets found in the `DESIGN_PRINCIPLES_GUIDE.md`. All code must strictly adhere to these rules to ensure it is simple, robust, verifiable, and maintainable.
-
-### 1\. Core Principles: The Go Implementation
-
-All code is a direct reflection of the **`DESIGN_PRINCIPLES_GUIDE.md`**. This includes:
-
--   **Test-Driven Correctness (TDD)**: This is a mandatory development workflow. All logic must be developed by first writing a failing test that explicitly defines the requirements. The implementation code is then written to make the test pass. The comprehensive test suite is the only acceptable proof of correctness.
-
--   **Automated Quality Enforcement**: Code quality is not a matter of opinion or manual review. It is enforced automatically. All code must pass the comprehensive checks of `golangci-lint` without errors before it can be considered complete.
-
--   **Self-Documenting Code**: Code must be self-documenting. This is achieved through meticulously chosen, intention-revealing names for packages, types, functions, and variables, supplemented by comprehensive `godoc` comments for all exported identifiers. The code's structure and flow must narrate its purpose without requiring external documentation to be understood.
-
--   **Simplicity and Clarity**: Write simple, readable code. Avoid overly complex generics or "clever" channel manipulations that obscure the code's intent.
-
--   **Acyclic Dependencies**: Ensure a Directed Acyclic Graph (DAG) for all package dependencies. Circular dependencies are a critical design flaw and are strictly forbidden.
-
--   **Single Responsibility**: Functions and interfaces must be small and focused. Each should have one, and only one, reason to change.
-
--   **Composition Over Inheritance**: Use struct embedding and interfaces for code reuse and flexibility.
-
--   **Error Handling Excellence**: Handle every `error` value explicitly and immediately.
-
-### 2\. Automated Quality Enforcement: The Toolchain
-
-We do not manually enforce style or catch common errors. We automate it with a comprehensive toolchain that provides a non-negotiable quality gate.
-
--   **Formatter (`gofmt`)**: Standard Go formatting is not optional. All code must be formatted with `gofmt` before submission. This is the first step in ensuring consistency.
-
--   **Comprehensive Linter (`golangci-lint`)**: This tool is mandatory. `golangci-lint` is a fast, configurable linter aggregator that runs many essential linters---including `go vet`, `staticcheck`, `errcheck`, and dozens of others---in a single command. It provides a powerful, unified mechanism for catching a wide range of bugs, performance issues, style inconsistencies, and security vulnerabilities.
-
-Code that does not pass  `gofmt` and `golangci-lint` (with a strict, project-defined configuration) is, by definition, incomplete and will be rejected.
-
-### 3\. Self-Documenting Code: Naming and Documentation
-
-Code is read far more often than it is written. Optimize for the reader.
-
-#### Naming Conventions
-
-Names must be explicit and intention-revealing. Use `camelCase` for unexported and `PascalCase` for exported identifiers. Avoid cryptic or single-letter abbreviations in larger scopes.
-
-````
-
-// ❌ BAD: Ambiguous, overly abbreviated names
-func proc(d data) error {
-// ... what is 'd'? what does 'proc' do?
-}
-
-// ✅ GOOD: Clear, descriptive, and explicit names
-// package user provides functionality for managing user profiles.
-package user
-
-// Profile represents a user's profile data.
-type Profile struct {
-// ...
-}
-
-// FetchProfileByID retrieves a user profile from the database by its unique ID.
-func FetchProfileByID(ctx context.Context, userID string) (\*Profile, error) {
-// The names clearly state their purpose and context.
-}
-
-````
-
-#### Documentation (`godoc`)
-
-Every exported package, type, function, and method **must** have a `godoc` comment explaining its purpose, parameters, and return values. This is a foundational requirement for **Self-Documenting Code**.
-
-### 4\. Package and Module Design
-
--   **Package Naming**: Use lowercase, short, and descriptive package names that describe their purpose.
-
-    -   **Forbidden Names**: Avoid generic names like `util`, `common`, or `helpers`. These names become a dumping ground for unrelated code and violate the Single Responsibility Principle.
-
--   **Acyclic Dependencies**: Package dependencies must not contain cycles. Use `go mod graph` and static analysis tools within `golangci-lint` to enforce a DAG structure.
-
--   **Interfaces**: Define small, focused interfaces in the package that *consumes* the functionality. This follows the principle "accept interfaces, return structs" and promotes decoupling, making components easier to test and reuse.
-
-    ```
-    // In the CONSUMING package (e.g., reporting)
-    package reporting
-
-    // ReportGenerator defines the contract for anything that can generate a report.
-    type ReportGenerator interface {
-        Generate(ctx context.Context, data any) (*Report, error)
-    }
-
-    func CreateSalesReport(ctx context.Context, generator ReportGenerator) {
-        // ... uses the generator
-    }
-
-    // In the IMPLEMENTING package (e.g., pdf)
-    package pdf
-
-    // Generator is a concrete type that fulfills the ReportGenerator interface.
-    type Generator struct{ /* ... */ }
-
-    func (g *Generator) Generate(ctx context.Context, data any) (*Report, error) {
-        // ... implementation to create a PDF report
-    }
-
-    ```
-
-### 5\. Function and Method Design
-
--   **Single Responsibility**: A function should do one thing and do it well. If a function's description requires the word "and," it is likely doing too much and must be refactored.
-
-    ```
-    // ❌ BAD: This function has multiple responsibilities.
-    func GetAndProcessUserData(ctx context.Context, userID string) error {
-        // 1. It fetches data from a database.
-        user, err := db.QueryRowContext(ctx, "...", userID)
-        // ...
-
-        // 2. It makes an API call.
-        extData, err := httpClient.Get("...")
-        // ...
-
-        // 3. It processes and combines the data.
-        // ...
-        return nil
-    }
-
-    // ✅ GOOD: Responsibilities are separated into focused functions.
-    func fetchUserFromDB(ctx context.Context, userID string) (*User, error) { /* ... */ }
-    func fetchExternalData(ctx context.Context, user *User) (*ExternalData, error) { /* ... */ }
-    func processUserData(user *User, extData *ExternalData) (*ProcessedData, error) { /* ... */ }
-
-    ```
+- **Acyclic Dependencies**: Module dependencies must form a Directed Acyclic Graph (DAG).
 
 ### 6\. Error Handling Patterns
 
--   **Declare Error Variables Uniquely**: To prevent accidental shadowing and ensure every error-producing call is explicitly handled, declare a new variable for each error.
+- **Custom Exceptions**: Define a custom exception hierarchy for your application's domain.
 
-    ```
-    // ✅ GOOD: Each error has a unique variable, preventing bugs.
-    file, errOpen := os.Open("config.yaml")
-    if errOpen != nil {
-        return fmt.Errorf("failed to open config file: %w", errOpen)
-    }
-    defer file.Close()
+- **Exception Chaining**: Always use `raise NewException from original_exception` to preserve the root cause.
 
-    data, errRead := io.ReadAll(file)
-    if errRead != nil {
-        return fmt.Errorf("failed to read config file: %w", errRead)
-    }
+- **Boundary Validation**: Validate all inputs at function and method boundaries and fail fast.
 
-    ```
+### 7\. Testing Standards
 
--   **Error Wrapping**: Always wrap errors with `fmt.Errorf("...: %w", err)` to add context. This preserves the original error, allowing for inspection with `errors.Is` and `errors.As`.
+- **Framework**: Use `pytest`.
 
--   **Immediate Handling**: Check for errors immediately after a function call. Do not defer error checks.
+- **TDD is Mandatory**: Follow a test-driven workflow.
 
-### 7\. Concurrency
+- **Test Isolation**: Tests must be independent. Use `pytest` fixtures for setup and teardown.
 
--   **Context is Mandatory**: Pass a `context.Context` as the first argument to any function that performs I/O, makes a network call, blocks, or could be long-running. This is critical for cancellation, deadlines, and passing request-scoped values.
-
--   **Channels for Communication**: Use channels to communicate between goroutines. Do not communicate by sharing memory.
-
--   **Graceful Shutdown**: Ensure all long-running goroutines can be shut down gracefully. This is typically achieved by selecting on the context's `Done()` channel.
-
-    ```
-    func worker(ctx context.Context, jobs <-chan Job) {
-        for {
-            select {
-            case <-ctx.Done():
-                // Context was cancelled, exit gracefully.
-                log.Println("Worker shutting down.")
-                return
-            case job := <-jobs:
-                // Process the job.
-                process(job)
-            }
-        }
-    }
-
-    ```
-
-### 8\. Testing Standards
-
--   **Framework**: Use the standard `testing` package. For assertions, use a well-regarded library like `testify/assert` or `testify/require` to make tests more readable and robust.
-
--   **TDD is Mandatory**: Follow a test-driven workflow. Write a failing test that defines the desired behavior before writing the implementation.
-
--   **Table-Driven Tests**: Use table-driven tests for testing multiple scenarios and edge cases concisely.
-
-    ```
-    // ✅ GOOD: A clear, table-driven test using testify.
-    func TestIsAdult(t *testing.T) {
-        testCases := []struct {
-            name     string
-            age      int
-            expected bool
-        }{
-            {"An 18-year-old is an adult", 18, true},
-            {"A 30-year-old is an adult", 30, true},
-            {"A 17-year-old is not an adult", 17, false},
-            {"A newborn is not an adult", 0, false},
-        }
-
-        for _, tc := range testCases {
-            t.Run(tc.name, func(t *testing.T) {
-                // Use require for fatal assertions, assert for non-fatal.
-                require.Equal(t, tc.expected, isAdult(tc.age))
-            })
-        }
-    }
-
-    ```Strict Go Coding Standard
-=========================
-
-This document establishes the non-negotiable Go coding standards for all projects. It is aligned with modern Go (1.23+) and is a direct implementation of the core tenets found in the `DESIGN_PRINCIPLES_GUIDE.md`. All code must strictly adhere to these rules to ensure it is simple, robust, verifiable, and maintainable.
-
-### 1\. Core Principles: The Go Implementation
-
-All code is a direct reflection of the **`DESIGN_PRINCIPLES_GUIDE.md`**. This includes:
-
--   **Test-Driven Correctness (TDD)**: This is a mandatory development workflow. All logic must be developed by first writing a failing test that explicitly defines the requirements. The implementation code is then written to make the test pass. The comprehensive test suite is the only acceptable proof of correctness.
-
--   **Automated Quality Enforcement**: Code quality is not a matter of opinion or manual review. It is enforced automatically. All code must pass the comprehensive checks of `golangci-lint` without errors before it can be considered complete.
-
--   **Self-Documenting Code**: Code must be self-documenting. This is achieved through meticulously chosen, intention-revealing names for packages, types, functions, and variables, supplemented by comprehensive `godoc` comments for all exported identifiers. The code's structure and flow must narrate its purpose without requiring external documentation to be understood.
-
--   **Simplicity and Clarity**: Write simple, readable code. Avoid overly complex generics or "clever" channel manipulations that obscure the code's intent.
-
--   **Acyclic Dependencies**: Ensure a Directed Acyclic Graph (DAG) for all package dependencies. Circular dependencies are a critical design flaw and are strictly forbidden.
-
--   **Single Responsibility**: Functions and interfaces must be small and focused. Each should have one, and only one, reason to change.
-
--   **Composition Over Inheritance**: Use struct embedding and interfaces for code reuse and flexibility.
-
--   **Error Handling Excellence**: Handle every `error` value explicitly and immediately.
-
-### 2\. Automated Quality Enforcement: The Toolchain
-
-We do not manually enforce style or catch common errors. We automate it with a comprehensive toolchain that provides a non-negotiable quality gate.
-
--   **Formatter (`gofmt`)**: Standard Go formatting is not optional. All code must be formatted with `gofmt` before submission. This is the first step in ensuring consistency.
-
--   **Comprehensive Linter (`golangci-lint`)**: This tool is mandatory. `golangci-lint` is a fast, configurable linter aggregator that runs many essential linters---including `go vet`, `staticcheck`, `errcheck`, and dozens of others---in a single command. It provides a powerful, unified mechanism for catching a wide range of bugs, performance issues, style inconsistencies, and security vulnerabilities.
-
-Code that does not pass  `gofmt` and `golangci-lint` (with a strict, project-defined configuration) is, by definition, incomplete and will be rejected.
-
-### 3\. Self-Documenting Code: Naming and Documentation
-
-Code is read far more often than it is written. Optimize for the reader.
-
-#### Naming Conventions
-
-Names must be explicit and intention-revealing. Use `camelCase` for unexported and `PascalCase` for exported identifiers. Avoid cryptic or single-letter abbreviations in larger scopes.
-
-````
-
-// ❌ BAD: Ambiguous, overly abbreviated names
-func proc(d data) error {
-// ... what is 'd'? what does 'proc' do?
-}
-
-// ✅ GOOD: Clear, descriptive, and explicit names
-// package user provides functionality for managing user profiles.
-package user
-
-// Profile represents a user's profile data.
-type Profile struct {
-// ...
-}
-
-// FetchProfileByID retrieves a user profile from the database by its unique ID.
-func FetchProfileByID(ctx context.Context, userID string) (\*Profile, error) {
-// The names clearly state their purpose and context.
-}
-
-````
-
-#### Documentation (`godoc`)
-
-Every exported package, type, function, and method **must** have a `godoc` comment explaining its purpose, parameters, and return values. This is a foundational requirement for **Self-Documenting Code**.
-
-### 4\. Package and Module Design
-
--   **Package Naming**: Use lowercase, short, and descriptive package names that describe their purpose.
-
-    -   **Forbidden Names**: Avoid generic names like `util`, `common`, or `helpers`. These names become a dumping ground for unrelated code and violate the Single Responsibility Principle.
-
--   **Acyclic Dependencies**: Package dependencies must not contain cycles. Use `go mod graph` and static analysis tools within `golangci-lint` to enforce a DAG structure.
-
--   **Interfaces**: Define small, focused interfaces in the package that *consumes* the functionality. This follows the principle "accept interfaces, return structs" and promotes decoupling, making components easier to test and reuse.
-
-    ```
-    // In the CONSUMING package (e.g., reporting)
-    package reporting
-
-    // ReportGenerator defines the contract for anything that can generate a report.
-    type ReportGenerator interface {
-        Generate(ctx context.Context, data any) (*Report, error)
-    }
-
-    func CreateSalesReport(ctx context.Context, generator ReportGenerator) {
-        // ... uses the generator
-    }
-
-    // In the IMPLEMENTING package (e.g., pdf)
-    package pdf
-
-    // Generator is a concrete type that fulfills the ReportGenerator interface.
-    type Generator struct{ /* ... */ }
-
-    func (g *Generator) Generate(ctx context.Context, data any) (*Report, error) {
-        // ... implementation to create a PDF report
-    }
-
-    ```
-
-### 5\. Function and Method Design
-
--   **Single Responsibility**: A function should do one thing and do it well. If a function's description requires the word "and," it is likely doing too much and must be refactored.
-
-    ```
-    // ❌ BAD: This function has multiple responsibilities.
-    func GetAndProcessUserData(ctx context.Context, userID string) error {
-        // 1. It fetches data from a database.
-        user, err := db.QueryRowContext(ctx, "...", userID)
-        // ...
-
-        // 2. It makes an API call.
-        extData, err := httpClient.Get("...")
-        // ...
-
-        // 3. It processes and combines the data.
-        // ...
-        return nil
-    }
-
-    // ✅ GOOD: Responsibilities are separated into focused functions.
-    func fetchUserFromDB(ctx context.Context, userID string) (*User, error) { /* ... */ }
-    func fetchExternalData(ctx context.Context, user *User) (*ExternalData, error) { /* ... */ }
-    func processUserData(user *User, extData *ExternalData) (*ProcessedData, error) { /* ... */ }
-
-    ```
-
-### 6\. Error Handling Patterns
-
--   **Declare Error Variables Uniquely**: To prevent accidental shadowing and ensure every error-producing call is explicitly handled, declare a new variable for each error.
-
-    ```
-    // ✅ GOOD: Each error has a unique variable, preventing bugs.
-    file, errOpen := os.Open("config.yaml")
-    if errOpen != nil {
-        return fmt.Errorf("failed to open config file: %w", errOpen)
-    }
-    defer file.Close()
-
-    data, errRead := io.ReadAll(file)
-    if errRead != nil {
-        return fmt.Errorf("failed to read config file: %w", errRead)
-    }
-
-    ```
-
--   **Error Wrapping**: Always wrap errors with `fmt.Errorf("...: %w", err)` to add context. This preserves the original error, allowing for inspection with `errors.Is` and `errors.As`.
-
--   **Immediate Handling**: Check for errors immediately after a function call. Do not defer error checks.
-
-### 7\. Concurrency
-
--   **Context is Mandatory**: Pass a `context.Context` as the first argument to any function that performs I/O, makes a network call, blocks, or could be long-running. This is critical for cancellation, deadlines, and passing request-scoped values.
-
--   **Channels for Communication**: Use channels to communicate between goroutines. Do not communicate by sharing memory.
-
--   **Graceful Shutdown**: Ensure all long-running goroutines can be shut down gracefully. This is typically achieved by selecting on the context's `Done()` channel.
-
-    ```
-    func worker(ctx context.Context, jobs <-chan Job) {
-        for {
-            select {
-            case <-ctx.Done():
-                // Context was cancelled, exit gracefully.
-                log.Println("Worker shutting down.")
-                return
-            case job := <-jobs:
-                // Process the job.
-                process(job)
-            }
-        }
-    }
-
-    ```
-
-### 8\. Testing Standards
-
--   **Framework**: Use the standard `testing` package. For assertions, use a well-regarded library like `testify/assert` or `testify/require` to make tests more readable and robust.
-
--   **TDD is Mandatory**: Follow a test-driven workflow. Write a failing test that defines the desired behavior before writing the implementation.
-
--   **Table-Driven Tests**: Use table-driven tests for testing multiple scenarios and edge cases concisely.
-
-    ```
-    // ✅ GOOD: A clear, table-driven test using testify.
-    func TestIsAdult(t *testing.T) {
-        testCases := []struct {
-            name     string
-            age      int
-            expected bool
-        }{
-            {"An 18-year-old is an adult", 18, true},
-            {"A 30-year-old is an adult", 30, true},
-            {"A 17-year-old is not an adult", 17, false},
-            {"A newborn is not an adult", 0, false},
-        }
-
-        for _, tc := range testCases {
-            t.Run(tc.name, func(t *testing.T) {
-                // Use require for fatal assertions, assert for non-fatal.
-                require.Equal(t, tc.expected, isAdult(tc.age))
-            })
-        }
-    }
-
-    ```Strict Bash Coding Standard
-===========================
+- # **Assert Exceptions**: Use `pytest.raises` when testing for expected errors.Strict Bash Coding Standard
 
 This document establishes the non-negotiable Bash coding standards for all projects. It is a direct implementation of the core tenets found in the `DESIGN_PRINCIPLES_GUIDE.md`. These rules must be followed strictly. Bash scripts are for simple automation and glue code; if logic becomes complex, **use Go or Python instead**.
 
@@ -666,23 +292,23 @@ This document establishes the non-negotiable Bash coding standards for all proje
 
 All scripts are a direct reflection of the **`DESIGN_PRINCIPLES_GUIDE.md`**. This includes:
 
--   **Verifiable Correctness**: While full TDD is difficult in shell scripting, every script must be verifiable. Functions should be written as testable units. The script's successful execution, validated by `shellcheck`, is the proof of correctness.
+- **Verifiable Correctness**: While full TDD is difficult in shell scripting, every script must be verifiable. Functions should be written as testable units. The script's successful execution, validated by `shellcheck`, is the proof of correctness.
 
--   **Automated Quality Enforcement**: Code quality is not a matter of opinion. All scripts **must** pass `shellcheck` with zero errors or warnings before they can be considered complete.
+- **Automated Quality Enforcement**: Code quality is not a matter of opinion. All scripts **must** pass `shellcheck` with zero errors or warnings before they can be considered complete.
 
--   **Self-Documenting Code**: Code must be self-documenting. This is achieved through meticulously chosen, intention-revealing names for variables and functions. Comments are used to explain *why* a complex command is used, not *what* it does.
+- **Self-Documenting Code**: Code must be self-documenting. This is achieved through meticulously chosen, intention-revealing names for variables and functions. Comments are used to explain _why_ a complex command is used, not _what_ it does.
 
--   **Simplicity is Non-Negotiable**: Keep scripts simple and focused on a single task.
+- **Simplicity is Non-Negotiable**: Keep scripts simple and focused on a single task.
 
--   **Idempotency**: Scripts must be idempotent wherever possible. Running a script multiple times must produce the same result as running it once.
+- **Idempotency**: Scripts must be idempotent wherever possible. Running a script multiple times must produce the same result as running it once.
 
--   **Safety and Strictness**: Fail fast and loudly on any error.
+- **Safety and Strictness**: Fail fast and loudly on any error.
 
 ### 2\. Automated Quality Enforcement: The Toolchain
 
 We do not manually enforce style or catch common errors. We automate it.
 
--   **Linter (`shellcheck`)**: This tool is **mandatory**. `shellcheck` is a powerful static analyzer that detects a huge range of bugs, security vulnerabilities, and stylistic issues in shell scripts. A clean `shellcheck` report is a non-negotiable quality gate.
+- **Linter (`shellcheck`)**: This tool is **mandatory**. `shellcheck` is a powerful static analyzer that detects a huge range of bugs, security vulnerabilities, and stylistic issues in shell scripts. A clean `shellcheck` report is a non-negotiable quality gate.
 
 Code that does not pass `shellcheck` is, by definition, incomplete and will be rejected.
 
@@ -692,108 +318,39 @@ Code that does not pass `shellcheck` is, by definition, incomplete and will be r
 
 Names must be explicit and clearly reveal their purpose.
 
--   **Global Constants**: `readonly UPPER_CASE_SNAKE` (e.g., `readonly MAX_RETRIES=3`).
+- **Global Constants**: `readonly UPPER_CASE_SNAKE` (e.g., `readonly MAX_RETRIES=3`).
 
--   **Local Variables**: `local lower_case_snake` (e.g., `local temp_file=""`).
+- **Local Variables**: `local lower_case_snake` (e.g., `local temp_file=""`).
 
--   **Functions**: `lower_case_snake` (e.g., `function process_log_file()`).
-
-````
-
-# ❌ BAD: Ambiguous, single-letter, or abbreviated names
-
-function proc() {
-local f="$1" # ...
-}
-
-# ✅ GOOD: Clear, descriptive, and explicit names
-
-# Processes a single log file, extracting error messages.
-
-#
-
-# @param $1 The path to the log file to process.
-
-function process_log_file() {
-local log_file_path="$1" # The name clearly states its purpose.
-}
-
-```
+- **Functions**: `lower_case_snake` (e.g., `function process_log_file()`).
 
 #### Comments
 
 Comments should explain the "why," not the "what." The code itself should explain what it is doing.
 
-```
-
-# ❌ BAD: A redundant comment
-
-# Set the log file path
-
-local log_file_path="/var/log/app.log"
-
-# ✅ GOOD: Explains the reason for a non-obvious choice
-
-# Use a non-blocking flock to prevent multiple cron jobs from running simultaneously.
-
-# If the lock can't be acquired, exit immediately.
-
-if ! flock -n /var/lock/my_app.lock -c "run_processing"; then
-log_error "Processing is already running."
-exit 1
-fi
-
-````
-
 ### 4\. Mandatory Settings and Structure
 
--   **Strict Mode**: Every script **must** begin with `set -euo pipefail`. This is non-negotiable.
+- **Strict Mode**: Every script **must** begin with `set -euo pipefail`. This is non-negotiable.
+  - `set -e`: Exit immediately on non-zero exit codes.
 
-    -   `set -e`: Exit immediately on non-zero exit codes.
+  - `set -u`: Treat unset variables as an error.
 
-    -   `set -u`: Treat unset variables as an error.
+  - `set -o pipefail`: Ensure failures in pipelines are caught.
 
-    -   `set -o pipefail`: Ensure failures in pipelines are caught.
-
--   **Strict Variable Scoping and Initialization**: All variables **must** be declared and initialized at the very top of their scope (global variables at the top of the script, `local` variables at the top of a function) before any other logic.
+- **Strict Variable Scoping and Initialization**: All variables **must** be declared and initialized at the very top of their scope (global variables at the top of the script, `local` variables at the top of a function) before any other logic.
 
 ### 5\. Error Handling Philosophy
 
--   **NEVER Redirect to `/dev/null`**: Error streams contain vital diagnostic information. Hiding them makes debugging impossible.
+- **NEVER Redirect to `/dev/null`**: Error streams contain vital diagnostic information. Hiding them makes debugging impossible.
 
--   **Capture All Command Results**: For every external command, you **must** capture its standard output, standard error, and exit code into separate variables for explicit checking. This provides robust control and clear error reporting.
-
-    ```
-    # ✅ GOOD: Explicit and robust capture of all command results
-    function run_command() {
-        local cmd_stdout=""
-        local cmd_stderr=""
-        local cmd_exit_code=0
-
-        # Capture stdout and stderr separately, ensuring robustness.
-        # This uses process substitution and a temporary file descriptor.
-        {
-            cmd_stdout=$(some_command 2> >(cmd_stderr=$(cat); declare -p cmd_stderr >&3))
-            cmd_exit_code="$?"
-        } 3> >(source /dev/stdin)
-
-        if [[ "$cmd_exit_code" -ne 0 ]]; then
-            printf "ERROR: Command failed with exit code %d\n" "$cmd_exit_code" >&2
-            printf "STDERR: %s\n" "$cmd_stderr" >&2
-            return 1
-        fi
-        printf "%s\n" "$cmd_stdout"
-    }
-
-    ```
+- **Capture All Command Results**: For every external command, you **must** capture its standard output, standard error, and exit code into separate variables for explicit checking. This provides robust control and clear error reporting.
 
 ### 6\. Variable and File Operations
 
--   **Quote Everything**: Always enclose variable expansions (`"$var"`) and command substitutions (`"$(command)"`) in double quotes. This is one of the most critical rules for preventing subtle and dangerous bugs related to word splitting and globbing.
+- **Quote Everything**: Always enclose variable expansions (`"$var"`) and command substitutions (`"$(command)"`) in double quotes. This is one of the most critical rules for preventing subtle and dangerous bugs related to word splitting and globbing.
 
--   **Use `printf` for Output**: Use `printf '%s\n' "$var"` for printing variable content. Never use `echo` for variables, as it can unpredictably interpret flags or escape sequences.
+- **Use `printf` for Output**: Use `printf '%s\n' "$var"` for printing variable content. Never use `echo` for variables, as it can unpredictably interpret flags or escape sequences.
 
--   **Atomic File Operations**: Use `mv` to atomically replace files and `mktemp` to create secure temporary files. This prevents race conditions.
+- **Atomic File Operations**: Use `mv` to atomically replace files and `mktemp` to create secure temporary files. This prevents race conditions.
 
--   **No Useless `cat`**: Use input redirection (`cmd < file`) instead of `cat file | cmd`.
-````
+- **No Useless `cat`**: Use input redirection (`cmd < file`) instead of `cat file | cmd`.
